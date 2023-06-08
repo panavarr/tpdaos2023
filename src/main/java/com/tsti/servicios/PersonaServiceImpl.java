@@ -35,6 +35,7 @@ public class PersonaServiceImpl implements PersonaService {
 	}
 	@Override
 	public void insert(Persona p) throws Exception {
+		
 		Set<ConstraintViolation<Persona>> cv = validator.validate(p);
 		if(cv.size()>0)
 		{
@@ -43,6 +44,10 @@ public class PersonaServiceImpl implements PersonaService {
 				err+=constraintViolation.getPropertyPath()+": "+constraintViolation.getMessage()+"\n";
 			}
 			throw new Excepcion(err,400);
+		}
+		else if(getById(p.getDni()).isPresent())
+		{
+			throw new Excepcion("Ya existe una persona con ese dni.",400);
 		}
 		else
 			dao.save(p);

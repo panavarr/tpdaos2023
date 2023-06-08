@@ -18,6 +18,8 @@ public class Ciudad {
 	private String nombre;
 	private String cp;
 	
+	
+	
 	public Ciudad()
 	{
 		super();

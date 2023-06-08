@@ -18,7 +18,7 @@ public class PersonaForm {
 	@Min(7000000)
 	private Long dni;
 	@NotNull
-	@Size(min=2, max=30)
+	@Size(min=2, max=30, message = "apellido demasiado largo")
 	private String apellido;
 	@NotNull
 	@Size(min=2, max=30)

@@ -74,6 +74,7 @@ public class PersonaRestController {
 	        dtos.add(buildResponse(pojo));
 		}
 		return dtos;
+//		return personas;
 
 	}
 	
@@ -123,35 +124,28 @@ public class PersonaRestController {
 		
 		if(result.hasErrors())
 		{
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.formatearError(result));
+			//Dos alternativas:
+			//throw new ResponseStatusException(HttpStatus.BAD_REQUEST, this.formatearError(result));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body( this.formatearError(result));
 		}
 		
-		
-//		if(form.getDni()==null)
-//			return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Debe indicar un dni");
-//		else if(service.getById(form.getDni()).isPresent())
-//			return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ya existe una persona con ese dni");
-//		else
-//		{
-			Persona p = form.toPojo();
-			Optional<Ciudad> c = ciudadService.getById(form.getIdCiudad());
-			if(c.isPresent())
-				p.setCiudad(c.get());
-			else
-			{
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(getError("02", "Ciudad Requerida", "La ciudad indicada no se encuentra en la base de datos."));
+		Persona p = form.toPojo();
+		Optional<Ciudad> c = ciudadService.getById(form.getIdCiudad());
+		if(c.isPresent())
+			p.setCiudad(c.get());
+		else
+		{
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(getError("02", "Ciudad Requerida", "La ciudad indicada no se encuentra en la base de datos."));
 //				return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La ciudad indicada no se encuentra en la base de datos.");
-			}
-			
-			
-			
-				service.insert(p);
-				URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{dni}")
-						.buildAndExpand(p.getDni()).toUri(); //Por convención en REST, se devuelve la  url del recurso recién creado
-
-				return ResponseEntity.created(location).build();//201 (Recurso creado correctamente)
+		}
 		
-//		}
+		//ahora inserto el cliente
+		service.insert(p);
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{dni}")
+				.buildAndExpand(p.getDni()).toUri(); //Por convención en REST, se devuelve la  url del recurso recién creado
+
+		return ResponseEntity.created(location).build();//201 (Recurso creado correctamente)
+		
 
 	}
 	
@@ -170,11 +164,11 @@ public class PersonaRestController {
 	 * @throws Excepcion 
 	 */
 	@PutMapping("/{dni}")
-	public ResponseEntity<Object>  actualizar(@RequestBody PersonaForm form, @PathVariable long dni) throws Excepcion
+	public ResponseEntity<Object>  actualizar(@RequestBody PersonaForm form, @PathVariable long dni) throws Exception
 	{
 		Optional<Persona> rta = service.getById(dni);
 		if(!rta.isPresent())
-			return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se encuentra la persona que desea modificar.");
+			return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la persona que desea modificar.");
 			
 		else
 		{
@@ -183,14 +177,15 @@ public class PersonaRestController {
 			if(c.isPresent())
 				p.setCiudad(c.get());
 			else
-				return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La ciudad indicada no se encuentra en la base de datos.");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(getError("02", "Ciudad Requerida", "La ciudad indicada no se encuentra en la base de datos."));
+//				return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("La ciudad indicada no se encuentra en la base de datos.");
 			
-			p.setDni(dni);  //El dni es el identificador, con lo cual es el único dato que no permito modificar
+			if(!p.getDni().equals(dni))//El dni es el identificador, con lo cual es el único dato que no permito modificar
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(getError("03", "Dato no editable", "Noi puede modificar el dni."));
 			service.update(p);
 			return ResponseEntity.ok(buildResponse(p));
 		}
 		
-
 	}
 	/**
 	 * Borra la persona con el dni indicado
@@ -202,7 +197,7 @@ public class PersonaRestController {
 	public ResponseEntity<String> eliminar(@PathVariable Long dni)
 	{
 		if(!service.getById(dni).isPresent())
-			return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe una persona con ese dni");
+			return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existe una persona con ese dni");
 		service.delete(dni);
 		
 		return ResponseEntity.ok().build();
@@ -269,7 +264,7 @@ public class PersonaRestController {
 		
 		//ahora usamos la librería Jackson para pasar el objeto a json
 				ObjectMapper maper = new ObjectMapper();
-				String json = maper.writeValueAsString(err);
+				String json = maper.writeValueAsString(e1);
 				return json;
 	}
 	

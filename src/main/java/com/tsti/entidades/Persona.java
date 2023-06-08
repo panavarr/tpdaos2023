@@ -1,5 +1,8 @@
 package com.tsti.entidades;
 
+import java.util.Collection;
+
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
@@ -22,8 +25,13 @@ public class Persona {
 	@Email(message = "El e-mail ingresado no es valido")
 	private String email;
 	
+	@ElementCollection
+	private Collection<String> notas;
+	
 	@ManyToOne
 	private Ciudad ciudad;
+	
+	
 	
 	public Long getDni() {
 		return dni;
@@ -59,6 +67,19 @@ public class Persona {
 	public void setCiudad(Ciudad ciudad) {
 		this.ciudad = ciudad;
 	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public Collection<String> getNotas() {
+		return notas;
+	}
+	public void setNotas(Collection<String> notas) {
+		this.notas = notas;
+	}
+	
 	
 	
 }
