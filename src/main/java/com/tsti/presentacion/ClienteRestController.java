@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -29,52 +30,52 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tsti.dto.PersonaResponseDTO;
+import com.tsti.dto.ClienteResponseDTO;
 import com.tsti.entidades.Ciudad;
-import com.tsti.entidades.Persona;
+import com.tsti.entidades.Cliente;
 import com.tsti.exception.Excepcion;
 import com.tsti.presentacion.error.MensajeError;
 import com.tsti.servicios.CiudadService;
-import com.tsti.servicios.PersonaService;
+import com.tsti.servicios.ClienteService;
 
 import jakarta.validation.Valid;
 /**
- * Recurso Personas
+ * Recurso Cliente
  * @author dardo
  *
  */
 @RestController
-@RequestMapping("/personas")
-public class PersonaRestController {
+@RequestMapping("/clientes")
+public class ClienteRestController {
 	
 	@Autowired
-	private PersonaService service; 
+	private ClienteService service; 
 	@Autowired
 	private CiudadService ciudadService;
 	
 	
 	/**
-	 * Permite filtrar personas. 
-	 * Ej1 curl --location --request GET 'http://localhost:8081/personas?apellido=Perez&&nombre=Juan' Lista las personas llamadas Perez, Juan
-	 * Ej2 curl --location --request GET 'http://localhost:8081/personas?apellido=Perez' Lista aquellas personas de apellido PErez
-	 * Ej3 curl --location --request GET 'http://localhost:8081/personas'   Lista todas las personas
+	 * Permite filtrar clientes. 
+	 * Ej1 curl --location --request GET 'http://localhost:8081/clientes?apellido=Perez&&nombre=Juan' Lista las clientes llamadas Perez, Juan
+	 * Ej2 curl --location --request GET 'http://localhost:8081/clientes?apellido=Perez' Lista aquellas clientes de apellido PErez
+	 * Ej3 curl --location --request GET 'http://localhost:8081/clientes'   Lista todas las clientes
 	 * @param apellido
 	 * @param nombre
 	 * @return
 	 * @throws Excepcion 
 	 */
 	@GetMapping( produces = { MediaType.APPLICATION_JSON_VALUE})
-	public List<PersonaResponseDTO> filtrarPersonas(@RequestParam(name = "apellido",required = false) String apellido 
+	public List<ClienteResponseDTO> filtrarClientes(@RequestParam(name = "apellido",required = false) String apellido 
 			, @RequestParam(name = "nombre",required = false)  @jakarta.validation.constraints.Size(min = 1, max = 20) String nombre) throws Excepcion {
 		
-		List<Persona> personas = service.filtrar(apellido,nombre);
-		List<PersonaResponseDTO> dtos=new ArrayList<PersonaResponseDTO>();
-		for (Persona pojo : personas) {
+		List<Cliente> clientes = service.filtrar(apellido,nombre);
+		List<ClienteResponseDTO> dtos=new ArrayList<ClienteResponseDTO>();
+		for (Cliente pojo : clientes) {
 			
 	        dtos.add(buildResponse(pojo));
 		}
 		return dtos;
-//		return personas;
+//		return clientes;
 
 	}
 	
@@ -82,20 +83,20 @@ public class PersonaRestController {
 
 
 	/**
-	 * Busca una persona a partir de su dni
-	 * 	curl --location --request GET 'http://localhost:8081/personas/27837171'
-	 * @param id DNI de la persona buscada
-	 * @return Persona encontrada o Not found en otro caso
+	 * Busca un Cliente a partir de su dni
+	 * 	curl --location --request GET 'http://localhost:8081/clientes/27837171'
+	 * @param id DNI del Cliente buscado
+	 * @return Cliente encontrada o Not found en otro caso
 	 * @throws Excepcion 
 	 */
 	@GetMapping(value = "/{id}", produces = { MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<PersonaResponseDTO> getById(@PathVariable Long id) throws Excepcion
+	public ResponseEntity<ClienteResponseDTO> getById(@PathVariable Long id) throws Excepcion
 	{
-		Optional<Persona> rta = service.getById(id);
+		Optional<Cliente> rta = service.getById(id);
 		if(rta.isPresent())
 		{
-			Persona pojo=rta.get();
-			return new ResponseEntity<PersonaResponseDTO>(buildResponse(pojo), HttpStatus.OK);
+			Cliente pojo=rta.get();
+			return new ResponseEntity<ClienteResponseDTO>(buildResponse(pojo), HttpStatus.OK);
 		}
 		else
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -104,8 +105,8 @@ public class PersonaRestController {
 	
 	
 	/**
-	 * Inserta una nueva persona en la base de datos
-	 * 			curl --location --request POST 'http://localhost:8081/personas' 
+	 * Inserta un nuevo cliente en la base de datos
+	 * 			curl --location --request POST 'http://localhost:8081/clientes' 
 	 *			--header 'Accept: application/json' 
 	 * 			--header 'Content-Type: application/json' 
 	 *			--data-raw '{
@@ -114,12 +115,12 @@ public class PersonaRestController {
 	 *			    "nombre": "juan",
 	 *			    "idCiudad": 2
 	 *			}'
-	 * @param p Persona  a insertar
-	 * @return Persona insertada o error en otro caso
+	 * @param p Cliente  a insertar
+	 * @return Cliente insertado o error en otro caso
 	 * @throws Exception 
 	 */
 	@PostMapping
-	public ResponseEntity<Object> guardar( @Valid @RequestBody PersonaForm form, BindingResult result) throws Exception
+	public ResponseEntity<Object> guardar( @Valid @RequestBody ClienteForm form, BindingResult result) throws Exception
 	{
 		
 		if(result.hasErrors())
@@ -129,7 +130,7 @@ public class PersonaRestController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body( this.formatearError(result));
 		}
 		
-		Persona p = form.toPojo();
+		Cliente p = form.toPojo();
 		Optional<Ciudad> c = ciudadService.getById(form.getIdCiudad());
 		if(c.isPresent())
 			p.setCiudad(c.get());
@@ -151,53 +152,62 @@ public class PersonaRestController {
 	
 	/**
 	 * Modifica una persona existente en la base de datos:
-	 * 			curl --location --request PUT 'http://localhost:8081/personas/27837176' 
+	 * 			curl --location --request PUT 'http://localhost:8081/clientes/27837176' 
 	 *			--header 'Accept: application/json' 
 	 * 			--header 'Content-Type: application/json' 
 	 *			--data-raw '{
+	 *				"dni": "27837176",
 	 *			    "apellido": "Perez",
 	 *			    "nombre": "Juan Martin"
 	 *			    "idCiudad": 1
 	 *			}'
-	 * @param p Persona a modificar
-	 * @return Persona Editada o error en otro caso
+	 * @param p Cliente a modificar
+	 * @return Cliente Editada o error en otro caso
 	 * @throws Excepcion 
 	 */
-	@PutMapping("/{dni}")
-	public ResponseEntity<Object>  actualizar(@RequestBody PersonaForm form, @PathVariable long dni) throws Exception
+	@PutMapping("/{id}")
+	public ResponseEntity<Object>  actualizar(@RequestBody ClienteForm form, @PathVariable Long id) throws Exception
 	{
-		Optional<Persona> rta = service.getById(dni);
+		Optional<Cliente> rta = service.getById(id);
 		if(!rta.isPresent())
-			return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la persona que desea modificar.");
+			return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra el Cliente que desea modificar.");
 			
 		else
 		{
-			Persona p = form.toPojo();
+			Cliente p = form.toPojo();
 			Optional<Ciudad> c = ciudadService.getById(form.getIdCiudad());
-			if(c.isPresent())
+			if(p.getDni()!=null) {
+				if (p.getDni()!=id) {
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se puede puede actualizar el DNI.");
+				}
+			}
+					
+			if(c.isPresent()) {
 				p.setCiudad(c.get());
+				p.setDni(id);
+			}
 			else
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(getError("02", "Ciudad Requerida", "La ciudad indicada no se encuentra en la base de datos."));
 //				return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("La ciudad indicada no se encuentra en la base de datos.");
 			
-			if(!p.getDni().equals(dni))//El dni es el identificador, con lo cual es el único dato que no permito modificar
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(getError("03", "Dato no editable", "Noi puede modificar el dni."));
+//			if(!p.getDni().equals(id))//El dni es el identificador, con lo cual es el único dato que no permito modificar
+//				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(getError("03", "Dato no editable", "No puede modificar el dni."));
 			service.update(p);
 			return ResponseEntity.ok(buildResponse(p));
 		}
 		
 	}
 	/**
-	 * Borra la persona con el dni indicado
-	 * 	  curl --location --request DELETE 'http://localhost:8081/personas/27837176'
-	 * @param dni Dni de la persona a borrar
-	 * @return ok en caso de borrar exitosamente la persona, error en otro caso
+	 * Borra el Cliente con el dni indicado
+	 * 	  curl --location --request DELETE 'http://localhost:8081/clientes/27837176'
+	 * @param dni Dni del cliente a borrar
+	 * @return ok en caso de borrar exitosamente el Cliente, error en otro caso
 	 */
 	@DeleteMapping("/{dni}")
 	public ResponseEntity<String> eliminar(@PathVariable Long dni)
 	{
 		if(!service.getById(dni).isPresent())
-			return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existe una persona con ese dni");
+			return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("No existe un cliente con ese dni");
 		service.delete(dni);
 		
 		return ResponseEntity.ok().build();
@@ -214,14 +224,14 @@ public class PersonaRestController {
 	 * @return
 	 * @throws Excepcion 
 	 */
-	private PersonaResponseDTO buildResponse(Persona pojo) throws Excepcion {
+	private ClienteResponseDTO buildResponse(Cliente pojo) throws Excepcion {
 		try {
-			PersonaResponseDTO dto = new PersonaResponseDTO(pojo);
+			ClienteResponseDTO dto = new ClienteResponseDTO(pojo);
 			 //Self link
-			Link selfLink = WebMvcLinkBuilder.linkTo(PersonaRestController.class)
+			Link selfLink = WebMvcLinkBuilder.linkTo(ClienteRestController.class)
 										.slash(pojo.getDni())                
 										.withSelfRel();
-			//Method link: Link al servicio que permitirá navegar hacia la ciudad relacionada a la persona
+			//Method link: Link al servicio que permitirá navegar hacia la ciudad relacionada al cliente
 			Link ciudadLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(CiudadRestController.class)
 			       													.getById(pojo.getCiudad().getId()))
 			       													.withRel("ciudad");

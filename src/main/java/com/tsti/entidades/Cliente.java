@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 @Entity
-public class Persona {
+public class Cliente {
 
 
 	@Id
@@ -21,13 +21,17 @@ public class Persona {
 	
 	private String nombre;
 	
-
+	private String domicilio;
+	
+	private String fechaNacimiento;
+	
+	private String numeroPasaporte;
+	
+	private String fechaVencimientoPasaporte;
+	
 	@Email(message = "El e-mail ingresado no es valido")
 	private String email;
-	
-	@ElementCollection
-	private Collection<String> notas;
-	
+
 	@ManyToOne
 	private Ciudad ciudad;
 	
@@ -51,15 +55,34 @@ public class Persona {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	
-	
-	
+	public String getDomicilio() {
+		return domicilio;
+	}
+	public void setDomicilio(String domicilio) {
+		this.domicilio = domicilio;
+	}
+	public String getFechaNacimiento() {
+		return fechaNacimiento;
+	}
+	public void setFechaNacimiento(String fechaNacimiento) {
+		this.fechaNacimiento = fechaNacimiento;
+	}
+	public String getNumeroPasaporte() {
+		return numeroPasaporte;
+	}
+	public void setNumeroPasaporte(String numeroPasaporte) {
+		this.numeroPasaporte = numeroPasaporte;
+	}
+	public String getFechaVencimientoPasaporte() {
+		return fechaVencimientoPasaporte;
+	}
+	public void setFechaVencimientoPasaporte(String fechaVencimientoPasaporte) {
+		this.fechaVencimientoPasaporte = fechaVencimientoPasaporte;
+	}
 	@Override
 	public String toString() {
 		return dni+" - "+ nombre +" "+ apellido;
 	}
-	
-	
 	
 	public Ciudad getCiudad() {
 		return ciudad;
@@ -73,13 +96,4 @@ public class Persona {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public Collection<String> getNotas() {
-		return notas;
-	}
-	public void setNotas(Collection<String> notas) {
-		this.notas = notas;
-	}
-	
-	
-	
 }

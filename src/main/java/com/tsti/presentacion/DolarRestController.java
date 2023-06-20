@@ -14,7 +14,7 @@ import com.tsti.dto.CotizacionDolar;
 import com.tsti.exception.Excepcion;
 import com.tsti.servicios.DolarProxy;
 /**
- * Recurso Personas
+ * Recurso Clientes
  * @author dardo
  *
  */

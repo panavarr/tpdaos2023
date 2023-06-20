@@ -7,40 +7,40 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.tsti.accesoADatos.PersonaDao;
-import com.tsti.entidades.Persona;
+import com.tsti.accesoADatos.ClienteDao;
+import com.tsti.entidades.Cliente;
 import com.tsti.exception.Excepcion;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 @Service
-public class PersonaServiceImpl implements PersonaService {
+public class ClienteServiceImpl implements ClienteService {
 	@Autowired
 	private  Validator validator;
 	
 	@Autowired
-	private PersonaDao dao;
+	private ClienteDao dao;
 	@Override
-	public List<Persona> getAll() {
+	public List<Cliente> getAll() {
 		return dao.findAll();
 	}
 	@Override
-	public Optional<Persona> getById(Long id) {
+	public Optional<Cliente> getById(Long id) {
 		return  dao.findById(id);
 		
 	}
 	@Override
-	public void update(Persona p) {
+	public void update(Cliente p) {
 		dao.save(p);
 	}
 	@Override
-	public void insert(Persona p) throws Exception {
+	public void insert(Cliente p) throws Exception {
 		
-		Set<ConstraintViolation<Persona>> cv = validator.validate(p);
+		Set<ConstraintViolation<Cliente>> cv = validator.validate(p);
 		if(cv.size()>0)
 		{
 			String err="";
-			for (ConstraintViolation<Persona> constraintViolation : cv) {
+			for (ConstraintViolation<Cliente> constraintViolation : cv) {
 				err+=constraintViolation.getPropertyPath()+": "+constraintViolation.getMessage()+"\n";
 			}
 			throw new Excepcion(err,400);
@@ -57,7 +57,7 @@ public class PersonaServiceImpl implements PersonaService {
 		dao.deleteById(id);
 	}
 	@Override
-	public List<Persona> filtrar(String apellido, String nombre) {
+	public List<Cliente> filtrar(String apellido, String nombre) {
 		if(apellido==null && nombre==null)
 			return dao.findAll();
 		else
