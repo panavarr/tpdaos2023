@@ -36,7 +36,7 @@ import com.tsti.dto.VueloResponseDTO;
 import com.tsti.entidades.Vuelo;
 import com.tsti.exception.Excepcion;
 import com.tsti.presentacion.error.MensajeError;
-import com.tsti.servicios.VueloService;
+import com.tsti.service.VueloService;
 
 import jakarta.validation.Valid;
 
